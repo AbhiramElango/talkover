@@ -1,0 +1,28 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest-tmp*/
+.mypy_cache/
+.ruff_cache/
+.modal/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+tmp/
+*.tmp
+*.log
+.DS_Store
+
+# Datasets, recordings, clips, model weights and results (TALKOVER_DATA_DIR default).
+/data/
+
+# Audio never belongs in the repository.
+*.ogg
+*.wav
+*.mp3
+*.flac
+
+.env

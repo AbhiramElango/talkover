@@ -1,0 +1,219 @@
+:root {
+  --bg: #f0efed;
+  --panel: var(--bg);
+  --line: #dcdad6;
+  --emboss: 10px 10px 24px rgba(120, 110, 100, 0.22), -10px -10px 24px rgba(255, 255, 255, 0.95);
+  --text: #1c1917;
+  --muted: #78716c;
+  --accent: #4f46e5;
+  --stop: #dc2626;
+  --stop-bg: #fef2f2;
+  --keep: #16a34a;
+  --keep-bg: #f0fdf4;
+  --user-color: #f59e0b;
+  --bubble-bot: rgba(255, 255, 255, 0.75);
+  --bubble-you: color-mix(in srgb, var(--accent) 13%, var(--bg));
+  --inset: inset 3px 3px 8px rgba(120, 110, 100, 0.16), inset -3px -3px 8px rgba(255, 255, 255, 0.8);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1a19;
+    --panel: var(--bg);
+    --line: #34302d;
+    --emboss: 10px 10px 24px rgba(0, 0, 0, 0.55), -10px -10px 24px rgba(255, 255, 255, 0.045);
+    --text: #f5f5f4;
+    --muted: #a8a29e;
+    --accent: #818cf8;
+    --stop: #f87171;
+    --stop-bg: #2a1212;
+    --keep: #4ade80;
+    --keep-bg: #0f2416;
+    --bubble-bot: rgba(255, 255, 255, 0.06);
+    --bubble-you: color-mix(in srgb, var(--accent) 22%, var(--bg));
+    --inset: inset 3px 3px 8px rgba(0, 0, 0, 0.45), inset -3px -3px 8px rgba(255, 255, 255, 0.03);
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+header { max-width: 980px; margin: 48px auto 28px; padding: 0 16px; }
+.eyebrow {
+  display: inline-block;
+  font-size: 13px; font-weight: 500;
+  color: var(--muted);
+  padding: 3px 10px;
+  border: 1px solid var(--line); border-radius: 999px;
+  margin-bottom: 16px;
+}
+h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 600; line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.025em; max-width: 30ch; }
+h1 .quiet { display: block; color: var(--muted); }
+header p { margin: 0 0 18px; color: var(--muted); max-width: 60ch; font-size: 16px; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.steps li {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px 6px 6px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.steps b {
+  display: grid; place-items: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--text); color: var(--bg);
+  font-size: 11px; font-weight: 600;
+}
+
+main {
+  max-width: 980px;
+  margin: 0 auto 40px;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 28px;
+}
+@media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+
+.side {
+  background: var(--panel);
+  border-radius: 20px;
+  box-shadow: var(--emboss), 0 0 0 1.5px transparent;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  transition: box-shadow 0.3s;
+}
+.side.live { box-shadow: var(--emboss), 0 0 0 1.5px var(--accent); }
+.side.halt { box-shadow: var(--emboss), 0 0 0 1.5px var(--stop); }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.head h2 { font-size: 16px; font-weight: 600; margin: 0; }
+.head span { font-size: 13px; color: var(--muted); }
+.tally { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.tally b { display: inline-block; min-width: 1ch; color: var(--text); font-weight: 600; }
+.tally b.bump { animation: pop 0.35s ease-out; }
+
+.status { display: flex; align-items: center; gap: 10px; }
+.state { font-size: 13px; color: var(--muted); }
+.side.live .state { color: var(--text); }
+.side.halt .state { color: var(--stop); }
+.orb {
+  --level: 0;
+  --user: 0;
+  position: relative;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  flex: none;
+}
+.ring {
+  position: absolute; inset: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--user-color);
+  opacity: calc(var(--user) * 0.9);
+  transform: scale(calc(1 + var(--user) * 0.6));
+  transition: transform 0.12s ease-out, opacity 0.2s;
+}
+.ring + .ring { transform: scale(calc(1 + var(--user) * 1.05)); opacity: calc(var(--user) * 0.45); }
+.core {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 55%, white), var(--accent));
+  opacity: 0.3;
+  transform: scale(calc(1 + var(--level) * 0.5));
+  transition: transform 0.06s, opacity 0.3s, background 0.3s;
+}
+.side.live .core { opacity: 0.9; animation: breathe 3.2s ease-in-out infinite; }
+.side.halt .core { background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--stop) 55%, white), var(--stop)); animation: halt 0.45s ease-out; }
+
+.meter { display: flex; flex-direction: column; gap: 4px; }
+.meter .track { position: relative; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.meter .fill { height: 100%; width: 0; background: var(--accent); transition: width 0.1s linear, background 0.1s; }
+.meter .fill.over { background: var(--stop); }
+.meter .tick { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--text); opacity: 0.5; }
+.meter .label { font-size: 11px; color: var(--muted); }
+.meter.idle { opacity: 0.35; }
+
+.chat {
+  height: 400px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  box-shadow: var(--inset);
+  scrollbar-width: thin;
+}
+.chat:empty::before {
+  content: "Start a call. Northwind Bank\2019s fraud team calls you about a charge; talk over it any time.";
+  margin: auto; max-width: 28ch; text-align: center;
+  color: var(--muted); font-size: 13px;
+}
+.msg {
+  max-width: 82%;
+  padding: 8px 12px;
+  border-radius: 16px;
+  font-size: 14px; line-height: 1.45;
+  overflow-wrap: anywhere;
+  animation: in 0.2s ease-out;
+}
+.msg.bot { align-self: flex-start; background: var(--bubble-bot); border-bottom-left-radius: 6px; }
+.msg.bot.cont { border-top-left-radius: 6px; }
+.msg.bot .cut {
+  display: inline-block; margin-left: 6px;
+  font-size: 11px; font-weight: 600; color: var(--stop);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  animation: pop 0.3s ease-out;
+}
+.msg.you {
+  align-self: flex-end;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  background: var(--bubble-you); color: var(--text);
+  border-bottom-right-radius: 6px;
+}
+.msg.you .pending { color: var(--muted); }
+.msg.you .tag { font-size: 11px; font-weight: 600; animation: pop 0.3s ease-out; }
+.msg.you.stopped { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--stop) 45%, transparent); }
+.msg.you.stopped .tag { color: var(--stop); }
+.msg.you.kept { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--keep) 45%, transparent); }
+.msg.you.kept .tag { color: var(--keep); }
+.dots { display: inline-flex; gap: 3px; padding: 4px 0; }
+.dots b { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: pulse 1s ease-in-out infinite; }
+.dots b:nth-child(2) { animation-delay: 0.15s; }
+.dots b:nth-child(3) { animation-delay: 0.3s; }
+
+.call {
+  font: inherit; font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--text);
+  color: var(--bg);
+  cursor: pointer;
+}
+.call:disabled { opacity: 0.5; cursor: default; }
+.side.live .call { background: transparent; color: var(--text); }
+
+.rise { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i) * 80ms); }
+
+@keyframes in { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+@keyframes breathe { 50% { scale: 1.06; } }
+@keyframes halt { 30% { scale: 0.82; } }
+@keyframes pulse { 50% { opacity: 0.4; } }
+@keyframes pop { 0% { scale: 0.8; opacity: 0; } 60% { scale: 1.08; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.meter.placeholder { visibility: hidden; }
+.head h2 .ours {
+  display: inline-block; margin-left: 4px;
+  font-size: 15px; line-height: 1;
+  color: var(--keep);
+  cursor: help;
+  animation: pop 0.5s ease-out 0.8s both;
+}

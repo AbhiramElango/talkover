@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "talkover"
+version = "0.1.0"
+description = "Interrupt vs. backchannel vs. ignore classification for voice agents"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26,<3",
+    "soundfile>=0.12,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+# Streaming detector only: what an agent needs at run time (no torch).
+runtime = [
+    "onnxruntime>=1.23,<2",
+    "scipy>=1.13,<2",
+]
+pipecat = [
+    "onnxruntime>=1.23,<2",
+    "pipecat-ai>=1.12,<2",
+    "scipy>=1.13,<2",
+]
+# Live side-by-side demo: stock Pipecat vs Talkover (Deepgram + Groq).
+demo = [
+    "fastapi>=0.115,<1",
+    "onnxruntime>=1.23,<2",
+    "pipecat-ai[deepgram,groq,silero,webrtc]>=1.12,<2",
+    "scipy>=1.13,<2",
+    "uvicorn>=0.32,<1",
+]
+# Data pipeline, training and evaluation of the interruption classifier.
+interruption = [
+    "huggingface-hub>=0.36,<1",
+    "pyarrow>=18",
+    "scipy>=1.13,<2",
+    "torch>=2.8",
+    "transformers==4.57.6",
+]
+# Baseline policies: Silero VAD and the transcript rule.
+vad = [
+    "onnxruntime>=1.23,<2",
+    "silero-vad[onnx-cpu]==6.2.1",
+]
+asr = ["faster-whisper==1.1.1"]
+asr-mlx = ["mlx-whisper; sys_platform == 'darwin'"]
+# DNSMOS and BEATs checks of the rendered evaluation sets.
+verify = [
+    "onnxruntime>=1.23,<2",
+    "scipy>=1.13,<2",
+    "torch>=2.8",
+    "torchaudio>=2.8",
+]
+export = [
+    "onnx>=1.17,<2",
+    "onnxruntime>=1.23,<2",
+]
+# Recording and echo-cancelling self-recorded agent calls.
+agent-calls = [
+    "livekit>=1.1,<2",
+    "sounddevice>=0.5,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]

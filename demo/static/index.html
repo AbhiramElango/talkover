@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interruption Side by Side</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <span class="eyebrow rise" style="--i:0">Live demo</span>
+    <h1 class="rise" style="--i:1">Most voice agents stop for every “mm‑hmm”. <span class="quiet">This one keeps talking.</span></h1>
+    <p class="rise" style="--i:2">A nod-along “yeah”, a cough, the TV in the background: a plain voice detector hears sound and goes quiet. Same bot on both sides, only the ears differ. Take the same call on each side and hear the difference.</p>
+    <ol class="steps rise" style="--i:3">
+      <li><b>1</b>Start a call: your bank flags a big charge</li>
+      <li><b>2</b>Say “mm-hmm”, “okay” as it reads the details</li>
+      <li><b>3</b>Then cut in: “wait, I didn’t make that”</li>
+    </ol>
+  </header>
+
+  <main>
+    <section class="side rise" style="--i:4" data-side="stock">
+      <div class="head">
+        <div>
+          <h2>Stock Pipecat</h2>
+          <span>Voice activity detection: any speech stops the bot</span>
+        </div>
+        <div class="tally"></div>
+      </div>
+      <div class="status">
+        <div class="orb"><i class="ring"></i><i class="ring"></i><div class="core"></div></div>
+        <span class="state">Not connected</span>
+      </div>
+      <div class="meter placeholder"><div class="track"></div><span class="label">&nbsp;</span></div>
+      <div class="chat"></div>
+      <button class="call">Start call</button>
+    </section>
+
+    <section class="side rise" style="--i:5" data-side="talkover">
+      <div class="head">
+        <div>
+          <h2>Talkover <span class="ours" title="Our model" aria-label="Our model">★</span></h2>
+          <span>Model decides: interrupt, backchannel or ignore</span>
+        </div>
+        <div class="tally"></div>
+      </div>
+      <div class="status">
+        <div class="orb"><i class="ring"></i><i class="ring"></i><div class="core"></div></div>
+        <span class="state">Not connected</span>
+      </div>
+      <div class="meter">
+        <div class="track"><div class="fill"></div><div class="tick"></div></div>
+        <span class="label">interrupt likelihood</span>
+      </div>
+      <div class="chat"></div>
+      <button class="call">Start call</button>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
