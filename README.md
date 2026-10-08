@@ -17,6 +17,32 @@ talking). It hears the caller and the agent's own audio, decides every
 > with a TTS agent it currently matches VAD; in-domain training data is the
 > next step.
 
+## Demo
+
+A fraud-check call from a fictional bank, taken twice with the same voice
+agent: stock Pipecat on the left, Talkover on the right. Only the
+interruption logic differs. All captures are real calls in the
+[live demo](#live-demo); the caller sounds were played through the laptop
+speakers.
+
+![Same call, same background noise: stock Pipecat stops and asks the caller to repeat; Talkover keeps going](docs/images/hero.jpg)
+
+*Same call, same background noise (one real run). Stock Pipecat is cut off
+and asks the caller to repeat; Talkover keeps talking.*
+
+<p>
+  <img src="docs/images/demo.gif" width="380" alt="Talkover call: the agent explains the charge, the caller cuts in with a question, the agent stops and answers">
+  <img src="docs/images/interrupt.jpg" width="380" alt="Close-up: the agent is cut off mid-sentence by 'Wait. Do I get my money back?'">
+</p>
+
+*A real interruption still stops the agent: "Wait. Do I get my money back?"
+cuts it off mid-sentence, and it answers the question. The caller's voice is
+macOS text-to-speech.*
+
+Live, Talkover's clearest edge today is background noise and fast reaction to
+real interruptions. With the demo's synthetic agent voice it still stops for
+many "mm-hmm"s; see the TTS-agent row in the results below.
+
 ## Results
 
 Stop rates 500 ms after the caller's sound. Interrupt should be high; the rest
