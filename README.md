@@ -173,4 +173,7 @@ demo/                   side-by-side live demo (Pipecat + browser)
 tests/
 ```
 
-Third-party models and datasets: [NOTICE.md](NOTICE.md).
+## Licence
+
+Apache-2.0 ([LICENSE](LICENSE)). Third-party models and datasets keep their
+own terms: [NOTICE.md](NOTICE.md).
