@@ -19,10 +19,12 @@ with the agent re-voiced by TTS.
 
 ## Results at 500 ms (stop rates; interrupt high is good, the rest low)
 
+AMI row: the released INT8 file scored one window at a time, as deployed.
+
 | Test set | Policy | Interrupt | Backchannel | Ignore | Stops before caller speaks |
 |---|---|---|---|---|---|
 | AMI test (meetings, noise added) | Silero VAD | 0.88 | 0.74 | 0.35 | 0.34 |
-| | Shipped model | 0.80 | 0.18 | 0.04 | 0.01 |
+| | Shipped model | 0.81 | 0.19 | 0.04 | 0.01 |
 | TurnBench dev (human calls) | Silero VAD | 0.77 | 0.70 | 0.03 | 0.12 |
 | | Shipped model | 0.81 | 0.37 | 0.02 | 0.05 |
 | Own agent calls, held-out (TTS agent) | Silero VAD | 0.68 | 0.73 | 0.00 | – |

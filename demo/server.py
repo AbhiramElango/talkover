@@ -18,7 +18,6 @@ from fastapi.staticfiles import StaticFiles
 from pipecat.transports.smallwebrtc.request_handler import SmallWebRTCRequest, SmallWebRTCRequestHandler
 
 from bot import StockPolicy, TalkoverPolicy, run_bot
-from talkover.interruption.paths import data_dir
 from talkover.interruption.runtime import ModelBundle
 
 ROOT = Path(__file__).resolve().parent
@@ -57,12 +56,13 @@ def create_app(bundle: ModelBundle) -> FastAPI:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--bundle", type=Path, default=data_dir() / "release" / "talkover")
+    parser.add_argument("--bundle", type=Path, help="local bundle directory (default: download from the Hugging Face Hub)")
     parser.add_argument("--port", type=int, default=7860)
     args = parser.parse_args()
 
     load_dotenv(ROOT.parent / ".env")
-    uvicorn.run(create_app(ModelBundle.load(args.bundle)), host="127.0.0.1", port=args.port)
+    bundle = ModelBundle.load(args.bundle) if args.bundle else ModelBundle.from_pretrained()
+    uvicorn.run(create_app(bundle), host="127.0.0.1", port=args.port)
 
 
 if __name__ == "__main__":

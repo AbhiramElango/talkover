@@ -21,6 +21,7 @@ from talkover.interruption.model.windows import INTERRUPT, WindowConfig, finaliz
 
 WindowModel = Callable[[NDArray[np.float32]], NDArray[np.float32]]
 BUNDLE_FILE = "bundle.json"
+DEFAULT_REPO = "Abhiram4abm/talkover"
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,14 @@ class ModelBundle:
         if hashlib.sha256(model.read_bytes()).hexdigest() != meta["sha256"]:
             raise ValueError(f"{model.name} does not match the bundle checksum")
         return cls(directory, meta["model"], replace(WindowConfig(), **meta["window"]), float(meta["threshold"]))
+
+    @classmethod
+    def from_pretrained(cls, repo_id: str = DEFAULT_REPO, revision: str | None = None) -> ModelBundle:
+        """Download the bundle from the Hugging Face Hub, or reuse the local cache."""
+
+        from huggingface_hub import snapshot_download
+
+        return cls.load(snapshot_download(repo_id, revision=revision, allow_patterns=[BUNDLE_FILE, "*.onnx"]))
 
     def save(self, extra: dict | None = None) -> None:
         path = self.directory / BUNDLE_FILE
@@ -125,6 +134,12 @@ class InterruptionDetector:
     def from_bundle(cls, bundle: ModelBundle | str | Path, threshold: float | None = None, threads: int = 1) -> InterruptionDetector:
         bundle = bundle if isinstance(bundle, ModelBundle) else ModelBundle.load(bundle)
         return cls(bundle.onnx_model(threads), bundle.config, bundle.threshold if threshold is None else threshold)
+
+    @classmethod
+    def from_pretrained(
+        cls, repo_id: str = DEFAULT_REPO, revision: str | None = None, threshold: float | None = None, threads: int = 1
+    ) -> InterruptionDetector:
+        return cls.from_bundle(ModelBundle.from_pretrained(repo_id, revision), threshold, threads)
 
     def push_agent(self, samples: NDArray[np.float32], rate: int) -> None:
         self.agent.push(samples, rate)

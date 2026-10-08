@@ -75,6 +75,25 @@ def test_bundle_round_trip_and_checksum(tmp_path: Path) -> None:
         ModelBundle.load(tmp_path)
 
 
+def test_from_pretrained_downloads_bundle_files_and_checks_them(tmp_path: Path, monkeypatch) -> None:
+    import huggingface_hub
+
+    (tmp_path / "model.onnx").write_bytes(b"weights")
+    ModelBundle(tmp_path, "model.onnx", CONFIG, 0.6).save()
+    calls = []
+
+    def fake_snapshot_download(repo_id, revision=None, allow_patterns=None):
+        calls.append((repo_id, revision, allow_patterns))
+        return str(tmp_path)
+
+    monkeypatch.setattr(huggingface_hub, "snapshot_download", fake_snapshot_download)
+    assert ModelBundle.from_pretrained(revision="v1").threshold == 0.6
+    assert calls == [("Abhiram4abm/talkover", "v1", ["bundle.json", "*.onnx"])]
+    (tmp_path / "model.onnx").write_bytes(b"tampered")
+    with pytest.raises(ValueError):
+        ModelBundle.from_pretrained()
+
+
 RELEASE = Path(__file__).resolve().parents[1] / "data" / "release" / "talkover"
 CLIPS = Path(__file__).resolve().parents[1] / "data" / "clips" / "agent_calls" / "test.jsonl"
 

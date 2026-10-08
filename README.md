@@ -46,13 +46,14 @@ many "mm-hmm"s; see the TTS-agent row in the results below.
 ## Results
 
 Stop rates 500 ms after the caller's sound. Interrupt should be high; the rest
-low. Full tables and confidence intervals are in
+low. The AMI row is the released INT8 file, scored as deployed. Full tables
+and confidence intervals are in
 [`experiments/results/interruption_summary.md`](experiments/results/interruption_summary.md).
 
 | Test set | Policy | Interrupt | Backchannel | Ignore | Stops before the caller speaks |
 |---|---|---|---|---|---|
 | AMI meetings, noise added | Silero VAD | 0.88 | 0.74 | 0.35 | 0.34 |
-| | Talkover | 0.80 | 0.18 | 0.04 | 0.01 |
+| | Talkover | 0.81 | 0.19 | 0.04 | 0.01 |
 | TurnBench dev, human calls | Silero VAD | 0.77 | 0.70 | 0.03 | 0.12 |
 | | Talkover | 0.81 | 0.37 | 0.02 | 0.05 |
 | Own calls with a TTS agent (held-out) | Silero VAD | 0.68 | 0.73 | 0.00 | – |
@@ -72,7 +73,6 @@ low. Full tables and confidence intervals are in
 
 ```bash
 uv pip install -e '.[pipecat]'
-.venv/bin/python scripts/interruption/package_model.py      # bundle: model.onnx + bundle.json
 ```
 
 ```python
@@ -80,7 +80,7 @@ from pipecat.turns.user_turn_strategies import UserTurnStrategies
 from talkover.integrations.pipecat import AgentAudioTap, TalkoverInterruptionStrategy
 from talkover.interruption.runtime import InterruptionDetector
 
-detector = InterruptionDetector.from_bundle("data/release/talkover")
+detector = InterruptionDetector.from_pretrained()   # Abhiram4abm/talkover on the Hugging Face Hub
 user_turn_strategies = UserTurnStrategies(start=[TalkoverInterruptionStrategy(detector=detector)])
 
 pipeline = Pipeline([
@@ -97,6 +97,8 @@ pipeline = Pipeline([
 - Use it as the only start strategy; a VAD or transcription start strategy in
   the same list would bypass the model.
 - The caller audio should be echo-cancelled (WebRTC clients and Daily do this).
+- To use your own trained model, `scripts/interruption/package_model.py` writes a
+  local bundle; load it with `InterruptionDetector.from_bundle(path)`.
 - Calibrate on a few labelled calls from your own agent:
   `scripts/interruption/calibrate.py --bundle ... --clips ... --write`.
 - `scripts/interruption/replay_call.py` streams a recorded call through the
